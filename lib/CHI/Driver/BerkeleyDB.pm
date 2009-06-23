@@ -42,12 +42,13 @@ sub _build_db {
     my $self = shift;
 
     my $filename = $self->filename;
-    for (1..3) {
-        if (my $db = eval { $self->mgr->open_db( file => $filename ) }) {
+    for ( 1 .. 3 ) {
+        if ( my $db = eval { $self->mgr->open_db( file => $filename ) } ) {
             return $db;
         }
     }
-    die sprintf("cannot open '%s/%s': %s %s", $self->root_dir, $filename, $!, $@);
+    die sprintf( "cannot open '%s/%s': %s %s",
+        $self->root_dir, $filename, $!, $@ );
 }
 
 sub fetch {
@@ -122,7 +123,8 @@ CHI::Driver::BerkeleyDB -- Using BerkeleyDB for cache
 
 =head1 DESCRIPTION
 
-This cache driver uses Berkeley DB files to store data. Each namespace is stored in its own db file.
+This cache driver uses Berkeley DB files to store data. Each namespace is
+stored in its own db file.
 
 =head1 CONSTRUCTOR OPTIONS
 
