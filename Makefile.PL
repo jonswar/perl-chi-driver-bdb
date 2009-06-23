@@ -10,8 +10,8 @@ perl_version '5.006';
 build_requires 'Test::Class' => 0;
 build_requires 'Test::Most'  => 0;
 
-requires 'List::MoreUtils'           => '0.13';
-requires 'Moose'                     => '0.66';
+requires 'CHI' => '0.25';
+requires 'BerkeleyDB::Manager' => '0.12';
 
 license 'perl';
 
