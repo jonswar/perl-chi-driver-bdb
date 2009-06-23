@@ -21,3 +21,9 @@ allow = refs
 # Default too short
 [RegularExpressions::ProhibitComplexRegexes]
 max_characters = 100
+
+# Theoretically I like this, but ultimately caused too many exceptions
+[-ErrorHandling::RequireCarping]
+
+# Berkeley DB uses these
+[-Variables::ProhibitPackageVars]
