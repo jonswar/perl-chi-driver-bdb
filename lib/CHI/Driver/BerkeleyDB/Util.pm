@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use base qw(Exporter);
 
+## no critic (ProhibitAutomaticExportation)
 our @EXPORT = qw(
   dp
   dps
