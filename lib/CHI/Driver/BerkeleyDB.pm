@@ -9,7 +9,7 @@ use warnings;
 
 extends 'CHI::Driver';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has 'db'       => ( is => 'ro', init_arg => undef, lazy_build => 1 );
 has 'filename' => ( is => 'ro', init_arg => undef, lazy_build => 1 );
