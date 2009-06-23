@@ -42,13 +42,13 @@ sub _build_db {
     my $self = shift;
 
     my $filename = $self->filename;
-    for ( 1 .. 3 ) {
-        if ( my $db = eval { $self->mgr->open_db( file => $filename ) } ) {
-            return $db;
-        }
+    if ( my $db = eval { $self->mgr->open_db($filename) } ) {
+        return $db;
     }
-    die sprintf( "cannot open '%s/%s': %s %s",
-        $self->root_dir, $filename, $!, $@ );
+    else {
+        die sprintf( "cannot open '%s/%s': %s %s",
+            $self->root_dir, $filename, $!, $@ );
+    }
 }
 
 sub fetch {
@@ -140,6 +140,22 @@ BerkeleyDB "Home".
 Any other constructor options L<not recognized by CHI|CHI/constructor> are
 passed along to L<BerkeleyDB::Manager-E<gt>new>. For example, you can pass
 I<db_class> to change from the default BerkeleyDB::Hash.
+
+=head1 SUPPORT AND DOCUMENTATION
+
+Questions and feedback are welcome, and should be directed to the perl-cache
+mailing list:
+
+    http://groups.google.com/group/perl-cache-discuss
+
+Bugs and feature requests will be tracked at RT:
+
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=CHI-Driver-BerkeleyDB
+
+The latest source code can be browsed and fetched at:
+
+    http://github.com/jonswar/perl-chi-driver-bdb/tree/master
+    git clone git://github.com/jonswar/perl-chi-driver-bdb.git
 
 =head1 AUTHOR
 
