@@ -9,7 +9,7 @@ use warnings;
 
 extends 'CHI::Driver';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has 'db'       => ( is => 'ro', lazy_build => 1 );
 has 'db_class' => ( is => 'ro', default    => 'BerkeleyDB::Hash' );
