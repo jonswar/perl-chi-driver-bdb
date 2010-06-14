@@ -2,7 +2,9 @@ Revision history for CHI-Driver-BerkeleyDB
 
 ** denotes an incompatible change
 
-0.02  Jun 23, 2009
+0.02  Jun 14, 2010
+
+- Replace BerkeleyDB::Manager with just BerkeleyDB to simplify
 
 0.01  Jun 23, 2009
 
