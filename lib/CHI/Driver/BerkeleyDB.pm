@@ -2,6 +2,7 @@ package CHI::Driver::BerkeleyDB;
 use 5.006;
 use BerkeleyDB;
 use CHI::Util qw(read_dir);
+use File::Path qw(mkpath);
 use Moose;
 use strict;
 use warnings;
@@ -12,8 +13,9 @@ our $VERSION = '0.02';
 
 has 'db'       => ( is => 'ro', lazy_build => 1 );
 has 'db_class' => ( is => 'ro', default    => 'BerkeleyDB::Hash' );
-has 'env'      => ( is => 'ro', lazy_build => 1 );
-has 'filename' => ( is => 'ro', init_arg   => undef, lazy_build => 1 );
+has 'dir_create_mode' => ( is => 'ro', isa => 'Int', default => oct(775) );
+has 'env' => ( is => 'ro', lazy_build => 1 );
+has 'filename' => ( is => 'ro', init_arg => undef, lazy_build => 1 );
 has 'root_dir' => ( is => 'ro' );
 
 __PACKAGE__->meta->make_immutable();
@@ -28,6 +30,8 @@ sub _build_env {
 
     my $root_dir = $self->root_dir;
     die "must specify one of env or root_dir" if !defined($root_dir);
+    mkpath( $root_dir, 0, $self->dir_create_mode )
+      if !-d $root_dir;
     my $env = BerkeleyDB::Env->new(
         '-Home'   => $self->root_dir,
         '-Config' => {},
