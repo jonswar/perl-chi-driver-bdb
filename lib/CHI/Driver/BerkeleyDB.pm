@@ -1,8 +1,7 @@
 package CHI::Driver::BerkeleyDB;
 use 5.006;
-use BerkeleyDB::Manager;
+use BerkeleyDB;
 use CHI::Util qw(read_dir);
-use CHI::Driver::BerkeleyDB::Util;
 use Moose;
 use strict;
 use warnings;
@@ -11,44 +10,47 @@ extends 'CHI::Driver';
 
 our $VERSION = '0.02';
 
-has 'db'       => ( is => 'ro', init_arg => undef, lazy_build => 1 );
-has 'filename' => ( is => 'ro', init_arg => undef, lazy_build => 1 );
-has 'mgr'      => ( is => 'ro', init_arg => undef, lazy_build => 1 );
-has 'root_dir' => ( is => 'ro', required => 1 );
+has 'db'       => ( is => 'ro', lazy_build => 1 );
+has 'db_class' => ( is => 'ro', default    => 'BerkeleyDB::Hash' );
+has 'env'      => ( is => 'ro', lazy_build => 1 );
+has 'filename' => ( is => 'ro', init_arg   => undef, lazy_build => 1 );
+has 'root_dir' => ( is => 'ro' );
 
 __PACKAGE__->meta->make_immutable();
-
-sub BUILD {
-    my ( $self, $params ) = @_;
-
-    $self->{mgr_params} = $self->non_common_constructor_params($params);
-}
-
-sub _build_mgr {
-    my $self = shift;
-    return BerkeleyDB::Manager->new(
-        home   => $self->root_dir,
-        create => 1,
-        %{ $self->{mgr_params} },
-    );
-}
 
 sub _build_filename {
     my $self = shift;
     return $self->escape_for_filename( $self->namespace ) . ".db";
 }
 
+sub _build_env {
+    my $self = shift;
+
+    my $root_dir = $self->root_dir;
+    die "must specify one of env or root_dir" if !defined($root_dir);
+    my $env = BerkeleyDB::Env->new(
+        '-Home'   => $self->root_dir,
+        '-Config' => {},
+        '-Flags'  => DB_CREATE | DB_INIT_CDB | DB_INIT_MPOOL
+      )
+      or die sprintf( "cannot open Berkeley DB environment in '%s': %s",
+        $root_dir, $BerkeleyDB::Error );
+    return $env;
+}
+
 sub _build_db {
     my $self = shift;
 
     my $filename = $self->filename;
-    if ( my $db = eval { $self->mgr->open_db($filename) } ) {
-        return $db;
-    }
-    else {
-        die sprintf( "cannot open '%s/%s': %s %s",
-            $self->root_dir, $filename, $!, $@ );
-    }
+    my $db       = $self->db_class->new(
+        '-Filename' => $filename,
+        '-Flags'    => DB_CREATE,
+        '-Env'      => $self->env
+      )
+      or die
+      sprintf( "cannot open Berkeley DB file '%s' in environment '%s': %s",
+        $filename, $self->root_dir, $BerkeleyDB::Error );
+    return $db;
 }
 
 sub fetch {
@@ -75,9 +77,9 @@ sub remove {
 sub clear {
     my ($self) = @_;
 
-    delete( $self->{db} );
-    delete( $self->{mgr} );
-    unlink( $self->root_dir . "/" . $self->filename );
+    my $count = 0;
+    $self->db->truncate($count) == 0
+      or die $BerkeleyDB::Error;
 }
 
 sub get_keys {
@@ -123,8 +125,12 @@ CHI::Driver::BerkeleyDB -- Using BerkeleyDB for cache
 
 =head1 DESCRIPTION
 
-This cache driver uses Berkeley DB files to store data. Each namespace is
-stored in its own db file.
+This cache driver uses L<Berkeley DB|BerkeleyDB> files to store data. Each
+namespace is stored in its own db file.
+
+By default, the driver configures the Berkeley DB environment to use the
+Concurrent Data Store (CDS), making it safe for multiple processes to read and
+write the cache without explicit locking.
 
 =head1 CONSTRUCTOR OPTIONS
 
@@ -132,14 +138,22 @@ stored in its own db file.
 
 =item root_dir
 
-Path to the directory that will contain the database files, also known as the
-BerkeleyDB "Home".
+Path to the directory that will contain the Berkeley DB environment, also known
+as the "Home".
+
+=item db_class
+
+BerkeleyDB class, defaults to BerkeleyDB::Hash.
+
+=item env
+
+Use this Berkeley DB environment instead of creating one.
+
+=item db
+
+Use this Berkeley DB object instead of creating one.
 
 =back
-
-Any other constructor options L<not recognized by CHI|CHI/constructor> are
-passed along to L<BerkeleyDB::Manager-E<gt>new>. For example, you can pass
-I<db_class> to change from the default BerkeleyDB::Hash.
 
 =head1 SUPPORT AND DOCUMENTATION
 
@@ -163,7 +177,7 @@ Jonathan Swartz
 
 =head1 SEE ALSO
 
-L<CHI>, L<BerkeleyDB>, L<BerkeleyDB::Manager>
+L<CHI>, L<BerkeleyDB>
 
 =head1 COPYRIGHT & LICENSE
 
