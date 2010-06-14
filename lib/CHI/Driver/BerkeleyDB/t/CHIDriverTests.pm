@@ -2,7 +2,6 @@ package CHI::Driver::BerkeleyDB::t::CHIDriverTests;
 use strict;
 use warnings;
 use CHI::Test;
-use CHI::Driver::BerkeleyDB::Util;
 use File::Slurp;
 use File::Temp qw(tempdir);
 use base qw(CHI::t::Driver);
@@ -10,10 +9,6 @@ use base qw(CHI::t::Driver);
 my ( $root_dir, $root_dir_initialized );
 
 sub testing_driver_class { 'CHI::Driver::BerkeleyDB' }
-
-sub required_modules {
-    return { 'BerkeleyDB::Manager' => undef, 'BerkeleyDB' => undef };
-}
 
 sub clear_root_dir : Test(setup) {
     $root_dir_initialized = 0;
