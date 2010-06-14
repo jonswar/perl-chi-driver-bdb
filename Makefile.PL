@@ -11,7 +11,7 @@ build_requires 'Test::Class' => 0;
 build_requires 'Test::Most'  => 0;
 
 requires 'CHI' => '0.25';
-requires 'BerkeleyDB::Manager' => '0.12';
+requires 'BerkeleyDB' => '0.30';
 
 license 'perl';
 
