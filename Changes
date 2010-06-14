@@ -4,7 +4,8 @@ Revision history for CHI-Driver-BerkeleyDB
 
 0.02  Jun 14, 2010
 
-- Replace BerkeleyDB::Manager with just BerkeleyDB to simplify
+- ** Just use BerkeleyDB instead of BerkeleyDB::Manager - some people were having trouble
+  installing BerkeleyDB::Manager and/or seeing extremely bad write performance
 
 0.01  Jun 23, 2009
 
