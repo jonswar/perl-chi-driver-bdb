@@ -2,7 +2,6 @@ package CHI::Driver::BerkeleyDB::t::CHIDriverTests;
 use strict;
 use warnings;
 use CHI::Test;
-use File::Slurp;
 use File::Temp qw(tempdir);
 use base qw(CHI::t::Driver);
 
