@@ -12,6 +12,7 @@ build_requires 'Test::Most'  => 0;
 
 requires 'CHI' => '0.25';
 requires 'BerkeleyDB' => '0.30';
+requires 'Moose' => 0;
 
 license 'perl';
 
